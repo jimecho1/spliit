@@ -15,7 +15,7 @@ export function BalanceSummary({ amount, currency }: Props) {
 
   if (amount === 0) {
     return (
-      <div className="w-fit rounded-3xl px-8 py-10 mb-4 bg-orange-50 dark:bg-orange-950/40">
+      <div className="rounded-3xl px-8 py-10 mb-2 bg-orange-50 dark:bg-orange-950/40">
         <p className="text-lg font-medium">{t('settled')}</p>
       </div>
     )
@@ -24,7 +24,7 @@ export function BalanceSummary({ amount, currency }: Props) {
   const isOwed = amount > 0
 
   return (
-    <div className="w-fit rounded-3xl px-8 py-10 mb-4 bg-orange-50 dark:bg-orange-950/40">
+    <div className="rounded-3xl px-8 py-10 mb-2 bg-orange-50 dark:bg-orange-950/40">
       <p className="text-sm text-muted-foreground mb-2">
         {isOwed ? t('youAreOwed') : t('youOwe')}
       </p>
