@@ -314,6 +314,7 @@
   "Balances": {
     "title": "Balances",
     "description": "This is the amount that each participant paid or was paid for.",
+    "you": "You",
     "Summary": {
       "youOwe": "You owe",
       "youAreOwed": "You are owed",

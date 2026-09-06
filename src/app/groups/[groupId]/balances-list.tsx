@@ -2,16 +2,23 @@ import { Participant } from '@/generated/prisma/browser'
 import { Balances } from '@/lib/balances'
 import { Currency } from '@/lib/currency'
 import { cn, formatCurrency } from '@/lib/utils'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 type Props = {
   balances: Balances
   participants: Participant[]
   currency: Currency
+  activeUserId?: string | null
 }
 
-export function BalancesList({ balances, participants, currency }: Props) {
+export function BalancesList({
+  balances,
+  participants,
+  currency,
+  activeUserId,
+}: Props) {
   const locale = useLocale()
+  const t = useTranslations('Balances')
 
   return (
     <div className="text-sm">
@@ -19,6 +26,7 @@ export function BalancesList({ balances, participants, currency }: Props) {
         const balance = balances[participant.id]?.total ?? 0
         const isPositive = balance > 0
         const isNegative = balance < 0
+        const isActiveUser = participant.id === activeUserId
         return (
           <div
             key={participant.id}
@@ -26,11 +34,25 @@ export function BalancesList({ balances, participants, currency }: Props) {
             data-participant={participant.name}
             className="flex items-center justify-between gap-3 py-4"
           >
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 font-semibold text-orange-900 dark:bg-orange-900/40 dark:text-orange-100">
+            <div className="flex min-w-0 items-center gap-3">
+              <div
+                className={cn(
+                  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-semibold',
+                  isActiveUser
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-orange-100 text-orange-900 dark:bg-orange-900/40 dark:text-orange-100',
+                )}
+              >
                 {participant.name.charAt(0).toUpperCase()}
               </div>
-              <span className="truncate">{participant.name}</span>
+              <span className="flex min-w-0 items-center gap-2">
+                <span className="truncate">{participant.name}</span>
+                {isActiveUser && (
+                  <span className="shrink-0 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/40 dark:text-orange-200">
+                    {t('you')}
+                  </span>
+                )}
+              </span>
             </div>
             <div
               className={cn(
