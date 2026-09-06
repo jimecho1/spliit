@@ -255,6 +255,12 @@
   "Balances": {
     "title": "Salda",
     "description": "Jest to kwota, którą każdy członek zapłacił lub otrzymał.",
+    "you": "Ty",
+    "Summary": {
+      "youOwe": "Musisz oddać",
+      "youAreOwed": "Należy Ci się",
+      "settled": "Wszystko rozliczone 🎉"
+    },
     "Reimbursements": {
       "title": "Sugerowane zwroty",
       "description": "Oto sugestie dotyczące optymalizacji zwrotów między uczestnikami.",

@@ -88,5 +88,13 @@
     "CurrencyField": {
       "placeholder": "$, €, £…"
     }
+  },
+  "Balances": {
+    "you": "Vos",
+    "Summary": {
+      "youOwe": "Devètz",
+      "youAreOwed": "Vos devon",
+      "settled": "Sètz en règla 🎉"
+    }
   }
 }

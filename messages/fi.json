@@ -236,6 +236,12 @@
   "Balances": {
     "title": "Saldo",
     "description": "Osallistujien saatavat tai velat.",
+    "you": "Sinä",
+    "Summary": {
+      "youOwe": "Olet velkaa",
+      "youAreOwed": "Sinulle ollaan velkaa",
+      "settled": "Olette tasoissa 🎉"
+    },
     "Reimbursements": {
       "title": "Maksuehdotus",
       "description": "Optimoitu ehdotus kuka maksaa kenellekin.",

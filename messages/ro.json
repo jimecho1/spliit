@@ -246,6 +246,12 @@
   "Balances": {
     "title": "Solduri",
     "description": "Aceasta este suma pe care fiecare membru a plătit-o sau cu care a fost plătit.",
+    "you": "Tu",
+    "Summary": {
+      "youOwe": "Tu datorezi",
+      "youAreOwed": "Ți se datorează",
+      "settled": "Ești la zi 🎉"
+    },
     "Reimbursements": {
       "title": "Rambursări sugerate",
       "description": "Acestea sunt sugestiile pentru rambursări optimizate între membrii.",

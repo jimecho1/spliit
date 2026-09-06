@@ -293,6 +293,12 @@
   "Balances": {
     "title": "Saldoak",
     "description": "Hau da kide bakoitzak ordaindu edo jaso duen zenbatekoa.",
+    "you": "Zu",
+    "Summary": {
+      "youOwe": "Zor duzu",
+      "youAreOwed": "Zorretan dizute",
+      "settled": "Dena garbi duzu 🎉"
+    },
     "Reimbursements": {
       "title": "Proposatutako diru-itzulketak",
       "description": "Hona hemen kideen arteko ditu-itzulketak optimizatzeko proposamenak.",

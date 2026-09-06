@@ -85,5 +85,13 @@
     "NameField": {
       "label": "Názov skupiny"
     }
+  },
+  "Balances": {
+    "you": "Ty",
+    "Summary": {
+      "youOwe": "Dlhuješ",
+      "youAreOwed": "Dlhujú ti",
+      "settled": "Máš vyrovnané 🎉"
+    }
   }
 }

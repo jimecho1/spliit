@@ -293,6 +293,12 @@
   "Balances": {
     "title": "Saldos",
     "description": "Este é o valor que cada participante pagou ou recebeu.",
+    "you": "Você",
+    "Summary": {
+      "youOwe": "Você deve",
+      "youAreOwed": "Devem a você",
+      "settled": "Tudo quitado 🎉"
+    },
     "Reimbursements": {
       "title": "Reembolsos sugeridos",
       "description": "Aqui estão sugestões para reembolsos otimizados entre os participantes.",

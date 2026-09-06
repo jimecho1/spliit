@@ -301,6 +301,12 @@
   "Balances": {
     "title": "Équilibres",
     "description": "Voici le montant que chaque participant a payé ou doit rembourser.",
+    "you": "Vous",
+    "Summary": {
+      "youOwe": "Vous devez",
+      "youAreOwed": "On vous doit",
+      "settled": "Vous êtes à jour 🎉"
+    },
     "Reimbursements": {
       "title": "Remboursements suggérés",
       "description": "Voici des suggestions pour des remboursements optimisés entre les participants.",

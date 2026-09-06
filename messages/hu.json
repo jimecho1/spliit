@@ -293,6 +293,12 @@
   "Balances": {
     "title": "Egyenlegek",
     "description": "Ez az az összeg, amelye az egyes résztvevők fizettek vagy nekik fizetve lett.",
+    "you": "Te",
+    "Summary": {
+      "youOwe": "Tartozol",
+      "youAreOwed": "Neked tartoznak",
+      "settled": "Nincs elszámolnivalód 🎉"
+    },
     "Reimbursements": {
       "title": "Javasolt költségtérítés",
       "description": "Íme néhány javaslat a résztvevők közötti optimális kifizetésekre.",

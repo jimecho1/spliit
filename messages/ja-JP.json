@@ -293,6 +293,12 @@
   "Balances": {
     "title": "残高",
     "description": "これは各参加者が支払ったまたは支払われた金額です。",
+    "you": "あなた",
+    "Summary": {
+      "youOwe": "支払う金額",
+      "youAreOwed": "受け取る金額",
+      "settled": "精算完了です 🎉"
+    },
     "Reimbursements": {
       "title": "提案される払い戻し",
       "description": "参加者間の最適化された払い戻しの提案です。",

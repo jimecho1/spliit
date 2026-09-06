@@ -293,6 +293,12 @@
   "Balances": {
     "title": "Saldod",
     "description": "See on summa, mille iga osaleja maksis või mis talle maksti.",
+    "you": "Sina",
+    "Summary": {
+      "youOwe": "Sa võlgned",
+      "youAreOwed": "Sulle võlgnetakse",
+      "settled": "Oled tasa 🎉"
+    },
     "Reimbursements": {
       "title": "Soovitatud hüvitised",
       "description": "Siin on soovitused optimeeritud hüvitisteks osalejate vahel.",

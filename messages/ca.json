@@ -301,6 +301,12 @@
   "Balances": {
     "title": "Balanç",
     "description": "L'import total que ha pagat o rebut cada participant.",
+    "you": "Tu",
+    "Summary": {
+      "youOwe": "Deus",
+      "youAreOwed": "Et deuen",
+      "settled": "Ja esteu en pau 🎉"
+    },
     "Reimbursements": {
       "title": "Proposta de reemborsaments",
       "description": "Suggeriments per a optimitzar els reemborsaments entre participants.",
