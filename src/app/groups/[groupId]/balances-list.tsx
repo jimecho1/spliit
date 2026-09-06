@@ -12,42 +12,35 @@ type Props = {
 
 export function BalancesList({ balances, participants, currency }: Props) {
   const locale = useLocale()
-  const maxBalance = Math.max(
-    ...Object.values(balances).map((b) => Math.abs(b.total)),
-  )
 
   return (
     <div className="text-sm">
       {participants.map((participant) => {
         const balance = balances[participant.id]?.total ?? 0
-        const isLeft = balance >= 0
+        const isPositive = balance > 0
+        const isNegative = balance < 0
         return (
           <div
             key={participant.id}
             data-testid="balance-row"
             data-participant={participant.name}
-            className={cn('flex', isLeft || 'flex-row-reverse')}
+            className="flex items-center justify-between gap-3 py-4"
           >
-            <div className={cn('w-1/2 p-2', isLeft && 'text-right')}>
-              {participant.name}
-            </div>
-            <div className={cn('w-1/2 relative', isLeft || 'text-right')}>
-              <div className="absolute inset-0 p-2 z-20">
-                {formatCurrency(currency, balance, locale)}
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 font-semibold text-orange-900 dark:bg-orange-900/40 dark:text-orange-100">
+                {participant.name.charAt(0).toUpperCase()}
               </div>
-              {balance !== 0 && (
-                <div
-                  className={cn(
-                    'absolute top-1 h-7 z-10',
-                    isLeft
-                      ? 'bg-green-200 dark:bg-green-800 left-0 rounded-r-lg border border-green-300 dark:border-green-700'
-                      : 'bg-red-200 dark:bg-red-800 right-0 rounded-l-lg border  border-red-300 dark:border-red-700',
-                  )}
-                  style={{
-                    width: (Math.abs(balance) / maxBalance) * 100 + '%',
-                  }}
-                ></div>
+              <span className="truncate">{participant.name}</span>
+            </div>
+            <div
+              className={cn(
+                'shrink-0 font-bold',
+                isPositive && 'text-green-600 dark:text-green-400',
+                isNegative && 'text-red-600 dark:text-red-400',
               )}
+            >
+              {isPositive && '+'}
+              {formatCurrency(currency, balance, locale)}
             </div>
           </div>
         )
