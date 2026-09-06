@@ -215,5 +215,13 @@
       "currencyNotFound": "Rất tiếc, Frankfurter hiện không có tỷ giá hối đoái cho loại tiền tệ này.",
       "noDate": "Nhập ngày phát sinh chi tiêu để lấy tỷ giá quy đổi."
     }
+  },
+  "Balances": {
+    "you": "Bạn",
+    "Summary": {
+      "youOwe": "Bạn nợ",
+      "youAreOwed": "Bạn được nhận",
+      "settled": "Bạn đã thanh toán xong 🎉"
+    }
   }
 }

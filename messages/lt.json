@@ -293,6 +293,12 @@
   "Balances": {
     "title": "Atsiskaitymų likučiai",
     "description": "Tai suma, kurią kiekvienas dalyvis sumokėjo arba gavo.",
+    "you": "Jūs",
+    "Summary": {
+      "youOwe": "Jūs skolingi",
+      "youAreOwed": "Jums skolingi",
+      "settled": "Visi atsiskaitymai sutvarkyti 🎉"
+    },
     "Reimbursements": {
       "title": "Siūlomos kompensacijos",
       "description": "Čia pateikti siūlymai, kaip optimaliai atsiskaityti tarp dalyvių.",

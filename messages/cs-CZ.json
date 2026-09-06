@@ -255,6 +255,12 @@
   "Balances": {
     "title": "Zůstatky",
     "description": "Toto je částka, kterou každý účastník zaplatil nebo za kterou bylo zaplaceno.",
+    "you": "Vy",
+    "Summary": {
+      "youOwe": "Dlužíte",
+      "youAreOwed": "Dluží Vám",
+      "settled": "Máte vyrovnáno 🎉"
+    },
     "Reimbursements": {
       "title": "Navrhovaná proplacení",
       "description": "Zde jsou návrhy na optimalizovaná proplacení mezi účastníky.",

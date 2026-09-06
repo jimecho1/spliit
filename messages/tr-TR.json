@@ -293,6 +293,12 @@
   "Balances": {
     "title": "Bakiyeler",
     "description": "Her katılımcının ödediği veya kendisi için ödenen tutar burada gösterilir.",
+    "you": "Siz",
+    "Summary": {
+      "youOwe": "Borcunuz var",
+      "youAreOwed": "Alacağınız var",
+      "settled": "Hesabınız kapandı 🎉"
+    },
     "Reimbursements": {
       "title": "Önerilen geri ödemeler",
       "description": "Katılımcılar arasındaki en uygun geri ödeme önerileri aşağıdadır.",

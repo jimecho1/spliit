@@ -1,6 +1,7 @@
 'use client'
 
 import { BalancesList } from '@/app/groups/[groupId]/balances-list'
+import { BalanceSummary } from '@/app/groups/[groupId]/balances/balance-summary'
 import { ReimbursementList } from '@/app/groups/[groupId]/reimbursement-list'
 import {
   Card,
@@ -11,6 +12,7 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TrackPage } from '@/lib/analytics/track-page'
+import { useActiveUser } from '@/lib/hooks'
 import { getCurrencyFromGroup } from '@/lib/utils'
 import { trpc } from '@/trpc/client'
 import { useTranslations } from 'next-intl'
@@ -25,6 +27,7 @@ export default function BalancesAndReimbursements() {
     trpc.groups.balances.list.useQuery({
       groupId,
     })
+  const activeUserId = useActiveUser(groupId)
   const t = useTranslations('Balances')
 
   useEffect(() => {
@@ -34,10 +37,20 @@ export default function BalancesAndReimbursements() {
   }, [utils])
 
   const isLoading = balancesAreLoading || !balancesData || !group
+  const activeUserBalance =
+    activeUserId && balancesData
+      ? balancesData.balances[activeUserId]
+      : undefined
 
   return (
     <>
       <TrackPage path={`/groups/${groupId}/balances`} />
+      {!isLoading && activeUserBalance && (
+        <BalanceSummary
+          amount={activeUserBalance.total}
+          currency={getCurrencyFromGroup(group)}
+        />
+      )}
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>{t('title')}</CardTitle>
@@ -51,6 +64,7 @@ export default function BalancesAndReimbursements() {
               balances={balancesData.balances}
               participants={group?.participants}
               currency={getCurrencyFromGroup(group)}
+              activeUserId={activeUserId}
             />
           )}
         </CardContent>

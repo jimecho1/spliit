@@ -293,6 +293,12 @@
   "Balances": {
     "title": "Balanser",
     "description": "Detta är det belopp som varje deltagare betalade eller fick betalt för.",
+    "you": "Du",
+    "Summary": {
+      "youOwe": "Du är skyldig",
+      "youAreOwed": "Du får tillbaka",
+      "settled": "Du är skuldfri 🎉"
+    },
     "Reimbursements": {
       "title": "Föreslagna ersättningar",
       "description": "Här är förslag på optimerade ersättningar mellan deltagarna.",

@@ -295,6 +295,12 @@
   "Balances": {
     "title": "Balances",
     "description": "Se trata del importe que ha pagado o ha recibido cada participante.",
+    "you": "Tú",
+    "Summary": {
+      "youOwe": "Debes",
+      "youAreOwed": "Te deben",
+      "settled": "Estás al día 🎉"
+    },
     "Reimbursements": {
       "title": "Reembolsos propuestos",
       "description": "He aquí algunas sugerencias para optimizar los reembolsos entre los participantes.",

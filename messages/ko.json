@@ -189,6 +189,12 @@
   },
   "Balances": {
     "title": "잔액",
+    "you": "나",
+    "Summary": {
+      "youOwe": "내가 보내야 할 금액",
+      "youAreOwed": "내가 받아야 할 금액",
+      "settled": "정산이 모두 끝났어요 🎉"
+    },
     "Reimbursements": {
       "title": "추천 정산 방법",
       "description": "참가자 간에 가장 좋은 정산 방안을 알려드려요.",

@@ -293,6 +293,12 @@
   "Balances": {
     "title": "יתרות",
     "description": "זה הסכום שכל משתתף שילם או קיבל.",
+    "you": "אתה",
+    "Summary": {
+      "youOwe": "אתה חייב",
+      "youAreOwed": "חייבים לך",
+      "settled": "הכל מסודר 🎉"
+    },
     "Reimbursements": {
       "title": "החזרים מוצעים",
       "description": "הנה הצעות להחזרים אופטימליים בין משתתפים.",

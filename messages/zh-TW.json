@@ -261,6 +261,12 @@
   "Balances": {
     "title": "總覽",
     "description": "這是每個成員已支付及需支付的金額",
+    "you": "你",
+    "Summary": {
+      "youOwe": "你要還",
+      "youAreOwed": "你可收",
+      "settled": "已經清晒數"
+    },
     "Reimbursements": {
       "title": "建議核銷",
       "description": "這是建議的銷帳方式",

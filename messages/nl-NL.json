@@ -301,6 +301,12 @@
   "Balances": {
     "title": "Balans",
     "description": "Dit zijn de bedragen die elke deelnemer heeft betaald of waarvoor is betaald.",
+    "you": "Jij",
+    "Summary": {
+      "youOwe": "Jij bent verschuldigd",
+      "youAreOwed": "Jij krijgt tegoed",
+      "settled": "Je staat quitte 🎉"
+    },
     "Reimbursements": {
       "title": "Voorgestelde terugbetalingen",
       "description": "Dit zijn de voorgestelde terugbetalingen tussen deelnemers.",

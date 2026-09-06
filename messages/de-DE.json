@@ -301,6 +301,12 @@
   "Balances": {
     "title": "Salden",
     "description": "Das sind die Beträge, die jeder Teilnehmer bezahlt oder erhalten hat.",
+    "you": "Du",
+    "Summary": {
+      "youOwe": "Du schuldest",
+      "youAreOwed": "Dir wird geschuldet",
+      "settled": "Du bist quitt 🎉"
+    },
     "Reimbursements": {
       "title": "Vorgeschlagene Rückzahlungen",
       "description": "Hier sind Vorschläge für optimierte Rückzahlungen zwischen Teilnehmern.",

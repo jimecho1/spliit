@@ -293,6 +293,12 @@
   "Balances": {
     "title": "余额",
     "description": "这是每位群组成员支付或被支付的金额。",
+    "you": "你",
+    "Summary": {
+      "youOwe": "你要还",
+      "youAreOwed": "你可收",
+      "settled": "已经结清"
+    },
     "Reimbursements": {
       "title": "建议报销",
       "description": "这里是优化群组成员之间报销的建议。",

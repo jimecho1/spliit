@@ -306,6 +306,12 @@
   "Balances": {
     "title": "Saldo",
     "description": "Ini adalah jumlah yang dibayarkan atau yang diterima oleh setiap peserta.",
+    "you": "Anda",
+    "Summary": {
+      "youOwe": "Anda harus membayar",
+      "youAreOwed": "Anda akan menerima",
+      "settled": "Semua sudah lunas 🎉"
+    },
     "Reimbursements": {
       "title": "Saran reimburse",
       "description": "Berikut adalah saran untuk reimburse yang optimal antara peserta.",
