@@ -65,6 +65,12 @@ model Expense {
   recurrenceRule         RecurrenceRule?       @default(NONE)
   recurringExpenseLink   RecurringExpenseLink?
   recurringExpenseLinkId String?
+
+  // Soft delete: an expense is never removed from the database, it is only
+  // marked as deleted so the activity log stays complete and restorable.
+  deletedAt DateTime?
+
+  @@index([groupId, deletedAt])
 }
 
 model ExpenseDocument {
@@ -125,6 +131,14 @@ model Activity {
   participantId String?
   expenseId     String?
   data          String?
+
+  // Name of the actor captured at write time. participantId can be removed or
+  // renamed later; this keeps the log readable regardless.
+  actorName String?
+
+  // { v, before, after, changes } - see src/lib/activity-log/types.ts.
+  // Append-only: rows are never updated or deleted.
+  payload Json?
 }
 
 enum ActivityType {
@@ -132,4 +146,5 @@ enum ActivityType {
   CREATE_EXPENSE
   UPDATE_EXPENSE
   DELETE_EXPENSE
+  RESTORE_EXPENSE
 }
