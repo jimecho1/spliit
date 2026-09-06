@@ -40,6 +40,28 @@
 | Hosting | Vercel |
 | 本機開發 DB | 都係用 Neon,唔開本機 Postgres |
 
+### 已經上咗線(2026-09-06 喺 dashboard 核對)
+
+| | |
+|---|---|
+| 網址 | https://spliit-ten-lime.vercel.app |
+| Vercel project | `bbc-7552/spliit`,駁住 `jimecho1/spliit`,Hobby plan |
+| 最後部署 | Merge PR #1 (design-1a),綠燈 |
+| Neon project | `spiltbill`,Free plan |
+| Neon region | **AWS US East 2 (Ohio)** |
+
+⚠️ **Region 同原本計劃唔同**。文件寫 Singapore,實際開咗 Ohio。你喺香港,
+每次 query 大概貴 200ms 左右。Neon 唔可以改一個 project 嘅 region,要換就要開新 project
+再搬數。而家啲數唔多,要換就趁早;唔換就算,但唔好再喺文件度寫住 Singapore。
+
+⚠️⚠️ **Preview 部署同 Production 共用同一個資料庫**。
+`POSTGRES_PRISMA_URL` 喺 Vercel 度 scope 係「Production and Preview」,
+而 `npm install` 嘅 postinstall 會跑 `prisma migrate deploy`。
+即係話 —— **你一 push 任何一條 branch 上 GitHub,嗰個 preview build 就會即刻
+喺你嘅正式資料庫度行 migration**,唔使 merge,唔使你撳任何嘢。
+
+做 schema 改動嘅時候,要記住呢點。安全做法見 §9。
+
 ### Upstream 狀況(2026-09-06 核對)
 
 Upstream **仲好活躍**,最新 commit 2026-08-31。原本份文件寫「約九個月冇新版、
@@ -113,9 +135,10 @@ order array(見 `activity-changes.tsx` 嘅 `SNAPSHOT_FIELD_ORDER`),
 ## 5. 進度
 
 - [x] **Step 1a** — Fork、clone 好咗(`jimecho1/spliit`)
-- [ ] **Step 1b** — 開 Neon、填 `.env`、`npm run dev` 本機行得起
-- [ ] **Step 2** — Deploy 上 Vercel,有自己條 URL
-- [x] **Step 3** — 改動記錄(schema + 寫 log + 畫面)← branch `activity-log`,未 merge
+- [x] **Step 1b** — Neon 開咗(`spiltbill`),Vercel 嗰邊環境變數齊
+- [ ] **Step 1c** — 本機 `.env` 未填,`npm run dev` 未行過(只係本機,線上冇事)
+- [x] **Step 2** — 已上線:https://spliit-ten-lime.vercel.app
+- [x] **Step 3** — 改動記錄(schema + 寫 log + 畫面)← branch `activity-log`,未 push、未 merge
 - [ ] **Step 4** — 執走唔要嘅嘢、mobile 手感、QR code
 - [ ] **Step 5** — 真人試用一次
 
@@ -178,7 +201,7 @@ Pooled = hostname 有 `-pooler`。Direct = 冇。兩條都要。
 我而家做緊 Step __。
 ```
 
-**Claude in Chrome**
+**Claude in Chrome**(線上版:https://spliit-ten-lime.vercel.app)
 ```
 我要試我自己 host 嗰個分賬 app。流程:開 group → 加人 → 加單 →
 睇 balances → 改一次單 → 睇 activity 頁確認見到改前改後 → 刪單 → 還原 →
@@ -213,12 +236,32 @@ git fetch upstream && git merge upstream/main
 
 ---
 
-## 9. 落一步
+## 9. 落一步 — 點樣安全咁上 Step 3
 
-1. 開 Neon,攞兩條 connection string,填 `.env`
-2. `npm install`(佢會跑 migration,包括新嗰條 `20260906160000_activity_log_diff_and_soft_delete`)
-3. `npm run dev`,行一次 §7 Claude in Chrome 嗰個流程
-4. 掂就 `git checkout main && git merge activity-log`,再做 Step 2 上 Vercel
+線上已經有真數。條 migration 係人手寫嘅(雲端環境攞唔到 Prisma migration engine),
+未經 `prisma migrate` 產生過。加上 §3 講嘅「preview 同 production 共用個 DB」,
+**唔好一 push 就算數**。
+
+### 建議次序
+
+1. **喺 Neon 開一條 branch**(Neon 嘅 branch 係即時複製一份成個 DB 連數據)。
+   Console → project `spiltbill` → Branches → New branch,由 `main` 開。
+2. 攞嗰條 branch 嘅 connection string,填落**本機** `.env`。
+   咁樣本機點試都唔會整親線上啲數。
+3. 本機 `npm install && npm run dev`。留意 install 嗰陣行 migration 有冇報錯 ——
+   呢個就係第一次真正用 Prisma 跑呢條 migration。
+4. 行一次 §7 Claude in Chrome 嗰個流程,確認改動記錄顯示得啱、還原掂。
+5. 冇問題先至 `git push -u origin activity-log`。
+   （記住:一 push,preview build 就會喺**正式** DB 行呢條 migration。
+   前面四步就係為咗確保到嗰刻你已經知佢行得過。）
+6. Vercel preview 綠燈、preview 網址試得掂,先至 merge 落 `main`。
+7. 用完就删咗 Neon 嗰條測試 branch(佢計 storage)。
+
+### 如果 migration 喺線上炒咗
+
+`prisma migrate deploy` 會將條 migration 標記做 failed,**之後每次部署都會拒絕行**,
+直至你處理咗佢。到時要 `npx prisma migrate resolve --rolled-back <migration 名>`
+(用線上條 connection string),再修好條 SQL。所以第 1–4 步唔好慳。
 
 ### Step 1 checkpoint
 
