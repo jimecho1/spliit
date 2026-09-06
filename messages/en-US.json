@@ -315,8 +315,8 @@
     "title": "Balances",
     "description": "This is the amount that each participant paid or was paid for.",
     "Summary": {
-      "youOwe": "You owe a total of",
-      "youAreOwed": "You are owed a total of",
+      "youOwe": "You owe",
+      "youAreOwed": "You are owed",
       "settled": "You're all settled up 🎉"
     },
     "Reimbursements": {
