@@ -1,12 +1,45 @@
 import {
   ActivityType,
   Expense,
+  Prisma,
   RecurrenceRule,
   RecurringExpenseLink,
 } from '@/generated/prisma/client'
+import {
+  ACTIVITY_PAYLOAD_VERSION,
+  diffExpenseSnapshots,
+  diffGroupSnapshots,
+  expenseSnapshotFromRecord,
+  groupSnapshotFromRecord,
+  type ExpenseActivityPayload,
+  type GroupActivityPayload,
+} from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 import { randomId } from '@/lib/random'
 import { ExpenseFormValues, GroupFormValues } from '@/lib/schemas'
+
+/** Relations a snapshot needs. Kept here so every call site stays in sync. */
+const EXPENSE_SNAPSHOT_INCLUDE = {
+  paidBy: true,
+  paidFor: true,
+  category: true,
+  documents: true,
+} as const
+
+/** Soft-deleted expenses are invisible everywhere except the activity log. */
+const NOT_DELETED = { deletedAt: null } as const
+
+/**
+ * Resolves the actor's display name from participants loaded *before* the
+ * change, so an update that renames or removes the actor still logs who did it.
+ */
+function resolveActorName(
+  participants: { id: string; name: string }[],
+  participantId?: string,
+): string | null {
+  if (!participantId) return null
+  return participants.find((p) => p.id === participantId)?.name ?? null
+}
 
 // Re-exported for backwards compatibility with existing server-side importers.
 export { randomId }
@@ -49,11 +82,6 @@ export async function createExpense(
   }
 
   const expenseId = randomId()
-  await logActivity(groupId, ActivityType.CREATE_EXPENSE, {
-    participantId,
-    expenseId,
-    data: expenseFormValues.title,
-  })
 
   const isCreateRecurrence =
     expenseFormValues.recurrenceRule !== RecurrenceRule.NONE
@@ -63,7 +91,8 @@ export async function createExpense(
     groupId,
   )
 
-  return prisma.expense.create({
+  const createdExpense = await prisma.expense.create({
+    include: EXPENSE_SNAPSHOT_INCLUDE,
     data: {
       id: expenseId,
       groupId,
@@ -106,23 +135,94 @@ export async function createExpense(
       notes: expenseFormValues.notes,
     },
   })
+
+  // Logged after the write, so the log never claims something that did not happen.
+  const after = expenseSnapshotFromRecord(createdExpense, group.participants)
+  await logActivity(groupId, ActivityType.CREATE_EXPENSE, {
+    participantId,
+    actorName: resolveActorName(group.participants, participantId),
+    expenseId,
+    data: createdExpense.title,
+    payload: {
+      v: ACTIVITY_PAYLOAD_VERSION,
+      after,
+      changes: [],
+    } satisfies ExpenseActivityPayload,
+  })
+
+  return createdExpense
 }
 
+/**
+ * Soft delete. The row stays in the database so the activity log keeps a full
+ * before-image and the expense can be restored; every read path filters it out.
+ */
 export async function deleteExpense(
   groupId: string,
   expenseId: string,
   participantId?: string,
 ) {
+  const group = await getGroup(groupId)
+  if (!group) throw new Error(`Invalid group ID: ${groupId}`)
+
   const existingExpense = await getExpense(groupId, expenseId)
-  await logActivity(groupId, ActivityType.DELETE_EXPENSE, {
-    participantId,
-    expenseId,
-    data: existingExpense?.title,
+  if (!existingExpense) throw new Error(`Invalid expense ID: ${expenseId}`)
+
+  const before = expenseSnapshotFromRecord(existingExpense, group.participants)
+
+  await prisma.expense.update({
+    where: { id: expenseId },
+    data: { deletedAt: new Date() },
   })
 
-  await prisma.expense.delete({
+  await logActivity(groupId, ActivityType.DELETE_EXPENSE, {
+    participantId,
+    actorName: resolveActorName(group.participants, participantId),
+    expenseId,
+    data: existingExpense.title,
+    payload: {
+      v: ACTIVITY_PAYLOAD_VERSION,
+      before,
+      after: null,
+      changes: [],
+    } satisfies ExpenseActivityPayload,
+  })
+}
+
+/** Undoes a soft delete. Recorded as its own append-only log entry. */
+export async function restoreExpense(
+  groupId: string,
+  expenseId: string,
+  participantId?: string,
+) {
+  const group = await getGroup(groupId)
+  if (!group) throw new Error(`Invalid group ID: ${groupId}`)
+
+  const existingExpense = await getExpense(groupId, expenseId, {
+    includeDeleted: true,
+  })
+  if (!existingExpense || existingExpense.groupId !== groupId) {
+    throw new Error(`Invalid expense ID: ${expenseId}`)
+  }
+  if (existingExpense.deletedAt === null) return
+
+  await prisma.expense.update({
     where: { id: expenseId },
-    include: { paidFor: true, paidBy: true },
+    data: { deletedAt: null },
+  })
+
+  const after = expenseSnapshotFromRecord(existingExpense, group.participants)
+  await logActivity(groupId, ActivityType.RESTORE_EXPENSE, {
+    participantId,
+    actorName: resolveActorName(group.participants, participantId),
+    expenseId,
+    data: existingExpense.title,
+    payload: {
+      v: ACTIVITY_PAYLOAD_VERSION,
+      before: null,
+      after,
+      changes: [],
+    } satisfies ExpenseActivityPayload,
   })
 }
 
@@ -170,11 +270,7 @@ export async function updateExpense(
       throw new Error(`Invalid participant ID: ${participant}`)
   }
 
-  await logActivity(groupId, ActivityType.UPDATE_EXPENSE, {
-    participantId,
-    expenseId,
-    data: expenseFormValues.title,
-  })
+  const before = expenseSnapshotFromRecord(existingExpense, group.participants)
 
   const isDeleteRecurrenceExpenseLink =
     existingExpense.recurrenceRule !== RecurrenceRule.NONE &&
@@ -203,8 +299,9 @@ export async function updateExpense(
     existingExpense.expenseDate,
   )
 
-  return prisma.expense.update({
+  const updatedExpense = await prisma.expense.update({
     where: { id: expenseId },
+    include: EXPENSE_SNAPSHOT_INCLUDE,
     data: {
       expenseDate: expenseFormValues.expenseDate,
       amount: expenseFormValues.amount,
@@ -281,6 +378,22 @@ export async function updateExpense(
       notes: expenseFormValues.notes,
     },
   })
+
+  const after = expenseSnapshotFromRecord(updatedExpense, group.participants)
+  await logActivity(groupId, ActivityType.UPDATE_EXPENSE, {
+    participantId,
+    actorName: resolveActorName(group.participants, participantId),
+    expenseId,
+    data: updatedExpense.title,
+    payload: {
+      v: ACTIVITY_PAYLOAD_VERSION,
+      before,
+      after,
+      changes: diffExpenseSnapshots(before, after),
+    } satisfies ExpenseActivityPayload,
+  })
+
+  return updatedExpense
 }
 
 export async function updateGroup(
@@ -291,9 +404,10 @@ export async function updateGroup(
   const existingGroup = await getGroup(groupId)
   if (!existingGroup) throw new Error('Invalid group ID')
 
-  await logActivity(groupId, ActivityType.UPDATE_GROUP, { participantId })
+  const before = groupSnapshotFromRecord(existingGroup)
 
-  return prisma.group.update({
+  const updatedGroup = await prisma.group.update({
+    include: { participants: true },
     where: { id: groupId },
     data: {
       name: groupFormValues.name,
@@ -323,6 +437,22 @@ export async function updateGroup(
       },
     },
   })
+
+  const after = groupSnapshotFromRecord(updatedGroup)
+  await logActivity(groupId, ActivityType.UPDATE_GROUP, {
+    participantId,
+    // Resolved from the group as it was before the update: this very update
+    // may have removed or renamed the person making it.
+    actorName: resolveActorName(existingGroup.participants, participantId),
+    payload: {
+      v: ACTIVITY_PAYLOAD_VERSION,
+      before,
+      after,
+      changes: diffGroupSnapshots(before, after),
+    } satisfies GroupActivityPayload,
+  })
+
+  return updatedGroup
 }
 
 export async function getGroup(groupId: string) {
@@ -366,6 +496,7 @@ export async function getGroupExpenses(
     },
     where: {
       groupId,
+      ...NOT_DELETED,
       title: options?.filter
         ? { contains: options.filter, mode: 'insensitive' }
         : undefined,
@@ -377,7 +508,7 @@ export async function getGroupExpenses(
 }
 
 export async function getGroupExpenseCount(groupId: string) {
-  return prisma.expense.count({ where: { groupId } })
+  return prisma.expense.count({ where: { groupId, ...NOT_DELETED } })
 }
 
 /**
@@ -403,6 +534,7 @@ export async function getActiveRecurringExpenses(groupId: string) {
     },
     where: {
       groupId,
+      ...NOT_DELETED,
       isReimbursement: false,
       recurrenceRule: { not: RecurrenceRule.NONE },
       recurringExpenseLink: { is: { nextExpenseCreatedAt: null } },
@@ -411,9 +543,16 @@ export async function getActiveRecurringExpenses(groupId: string) {
   })
 }
 
-export async function getExpense(groupId: string, expenseId: string) {
+export async function getExpense(
+  groupId: string,
+  expenseId: string,
+  options?: { includeDeleted?: boolean },
+) {
   return prisma.expense.findUnique({
-    where: { id: expenseId },
+    where: {
+      id: expenseId,
+      ...(options?.includeDeleted ? {} : NOT_DELETED),
+    },
     include: {
       paidBy: true,
       paidFor: true,
@@ -438,6 +577,8 @@ export async function getActivities(
   const expenseIds = activities
     .map((activity) => activity.expenseId)
     .filter(Boolean)
+  // Deliberately not filtered on deletedAt: the log has to keep showing an
+  // expense after it was deleted. `deletedAt` tells the UI how to render it.
   const expenses = await prisma.expense.findMany({
     where: {
       groupId,
@@ -457,14 +598,45 @@ export async function getActivities(
 export async function logActivity(
   groupId: string,
   activityType: ActivityType,
-  extra?: { participantId?: string; expenseId?: string; data?: string },
+  extra?: {
+    participantId?: string
+    expenseId?: string
+    data?: string
+    /**
+     * Name of the actor as it was *before* the change. Callers resolve it from
+     * the group they already loaded, because the change itself may rename or
+     * remove that participant.
+     */
+    actorName?: string | null
+    payload?: ExpenseActivityPayload | GroupActivityPayload
+  },
 ) {
+  const { payload, actorName: providedActorName, ...rest } = extra ?? {}
+
+  // Captured at write time: the participant may later be renamed or removed,
+  // and the log still has to say who did this.
+  const actorName =
+    providedActorName !== undefined
+      ? providedActorName
+      : rest.participantId
+        ? ((
+            await prisma.participant.findUnique({
+              where: { id: rest.participantId },
+              select: { name: true },
+            })
+          )?.name ?? null)
+        : null
+
   return prisma.activity.create({
     data: {
       id: randomId(),
       groupId,
       activityType,
-      ...extra,
+      ...rest,
+      actorName,
+      payload: payload
+        ? (payload as unknown as Prisma.InputJsonValue)
+        : undefined,
     },
   })
 }
@@ -489,6 +661,8 @@ async function createRecurringExpenses() {
         nextExpenseDate: {
           lte: utcDateFromLocal,
         },
+        // A deleted expense must not keep spawning new frames.
+        currentFrameExpense: { is: NOT_DELETED },
       },
       include: {
         currentFrameExpense: {
