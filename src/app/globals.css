@@ -3,25 +3,25 @@
 
 @layer base {
   :root {
-    --background: 240 24% 96%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 211 100% 50%;
+    --background: 37 77% 97%;
+    --foreground: 33 17% 25%;
+    --card: 36 100% 98%;
+    --card-foreground: 33 17% 25%;
+    --popover: 36 100% 98%;
+    --popover-foreground: 33 17% 25%;
+    --primary: 216 38% 47%;
     --primary-foreground: 0 100% 100%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 2% 57%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 3 100% 59%;
+    --secondary: 37 51% 92%;
+    --secondary-foreground: 33 17% 25%;
+    --muted: 37 51% 92%;
+    --muted-foreground: 31 13% 48%;
+    --accent: 48 100% 88%;
+    --accent-foreground: 33 17% 25%;
+    --destructive: 0 45% 56%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 2% 78%;
-    --input: 240 2% 78%;
-    --ring: 211 100% 50%;
+    --border: 34 29% 83%;
+    --input: 34 29% 83%;
+    --ring: 216 38% 47%;
     --radius: 0.75rem;
     --chart-1: 173 58% 39%;
     --chart-2: 12 76% 61%;
@@ -64,12 +64,12 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground; background-image: repeating-linear-gradient(to bottom, transparent, transparent 31px, hsl(34 29% 83% / 0.5) 31px, hsl(34 29% 83% / 0.5) 32px);
   }
 }
 
 .landing-header {
-  @apply bg-gradient-to-br from-blue-700 to-blue-500 dark:from-blue-300 dark:to-blue-500 bg-clip-text;
+  @apply bg-gradient-to-br from-amber-800 to-amber-600 dark:from-amber-300 dark:to-amber-600 bg-clip-text;
 }
 
 .landing-header strong {
